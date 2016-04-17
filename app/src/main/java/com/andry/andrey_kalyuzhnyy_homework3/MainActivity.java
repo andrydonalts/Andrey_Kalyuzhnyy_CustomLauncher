@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Adapter adapter;
     private GridView gridView;
-    private ArrayList<AppsDetail> appsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         gridView = (GridView) findViewById(R.id.gridview);
-        appsList = new ArrayList<AppsDetail>();
-
         adapter = new Adapter(this);
         adapter.loadApps();
         gridView.setAdapter(adapter);

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -26,9 +25,7 @@ public class Adapter extends BaseAdapter {
 
     public Adapter(Context context) {
         this.context = context;
-        //this.apps = apps;
         this.apps = new ArrayList<>();
-        loadApps();
     }
 
     @Override
@@ -54,6 +51,7 @@ public class Adapter extends BaseAdapter {
         if (convertView == null){
             holder = new Holder();
             convertView = View.inflate(context, R.layout.app_item, null);
+
             holder.icon = (ImageView) convertView.findViewById(R.id.app_item_icon);
             holder.label = (TextView) convertView.findViewById(R.id.app_item_label);
             holder.item = convertView.findViewById(R.id.app_item_item);
@@ -68,6 +66,7 @@ public class Adapter extends BaseAdapter {
         holder.icon.setImageDrawable(appsDetail.getIcon());
         holder.label.setText(appsDetail.getLabel());
 
+        // opening app
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +74,7 @@ public class Adapter extends BaseAdapter {
                 context.startActivity(intent);
             }
         });
+
         return convertView;
     }
 
