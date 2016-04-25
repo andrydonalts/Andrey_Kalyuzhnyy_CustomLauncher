@@ -27,7 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/ic_phone_white_24dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:id="@+id/activity_main_dialerButton"/>
 
 
         <Button
@@ -36,13 +37,15 @@
             android:layout_weight="1"
             android:textSize="@dimen/button_text_size"
             android:textStyle="bold"
-            android:text="приложения"/>
+            android:text="приложения"
+            android:id="@+id/activity_main_appsButton"/>
 
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/ic_send_white_24dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:id="@+id/activity_main_messageButton"/>
     </LinearLayout>
 
 </RelativeLayout>

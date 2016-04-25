@@ -1,33 +1,36 @@
 package com.andry.andrey_kalyuzhnyy_homework3;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
-import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Adapter adapter;
     private GridView gridView;
+    private View dialerButton;
+    private Button appsButton;
+    private View messageButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dialerButton = findViewById(R.id.activity_main_dialerButton);
+        appsButton = (Button) findViewById(R.id.activity_main_appsButton);
+        messageButton = findViewById(R.id.activity_main_messageButton);
+
+        dialerButton.setOnClickListener(this);
+        appsButton.setOnClickListener(this);
+        messageButton.setOnClickListener(this);
 
         gridView = (GridView) findViewById(R.id.gridview);
         adapter = new Adapter(this);
@@ -46,12 +49,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, OtherActivity.class));
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -62,5 +59,24 @@ public class MainActivity extends AppCompatActivity {
         else if (resources.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
             gridView.setNumColumns(resources.getInteger(R.integer.landscape_column_number));
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+
+        if (id == R.id.activity_main_appsButton) {
+            Intent intent = new Intent(this, AllAppsActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.activity_main_dialerButton) {
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_DIAL);
+            startActivity(intent);
+        } else if (id == R.id.activity_main_messageButton) {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.setType("vnd.android-dir/mms-sms");
+            startActivity(intent);
+        }
     }
 }
