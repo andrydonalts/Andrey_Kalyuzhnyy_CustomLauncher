@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,11 +39,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         messageButton.setOnClickListener(this);
 
         appsManager = new AppsManager(this);
-        //mainScreenApps = appsManager.fillMainScreenApps();
         appsManager.loadMainScreenApps();
         mainScreenApps = new ArrayList<>(15);
         mainScreenApps.addAll(appsManager.getMainScreenApps());
-        Log.d("MainActivity", Integer.toString(mainScreenApps.size()));
 
         setGridLayout();
 
@@ -83,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // putting views in gridlayout dynamically
     public void setGridLayout() {
         GridLayout gridLayout = (GridLayout) findViewById(R.id.activity_main_gridLayout);
         LayoutInflater layoutInflater = (LayoutInflater)
@@ -99,13 +97,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             final AppsDetail appsDetail = mainScreenApps.get(i);
             View appItemView = layoutInflater.inflate(R.layout.app_item, null, false);
 
+            // getting row and column number, because otherwise sequence views is wrong
             int col = 0;
             if (isPortraitOrientation() == false) {
                 col = i % 5;
             } else {
                 col = i % 3;
             }
-
             if (col == 0){
                 row++;
             }

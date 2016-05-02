@@ -2,7 +2,6 @@ package com.andry.andrey_kalyuzhnyy_homework3;
 
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,12 +25,10 @@ public class Adapter extends BaseAdapter implements Filterable {
     private ArrayList<AppsDetail> apps;
     private ArrayList<AppsDetail> filteredApps;
     private CustomFilter filter;
-    private PackageManager manager;
     private AppsManager appsManager;
 
     public Adapter(Context context) {
         this.context = context;
-        manager = context.getPackageManager();
 
         appsManager = new AppsManager(context);
         appsManager.loadApps();

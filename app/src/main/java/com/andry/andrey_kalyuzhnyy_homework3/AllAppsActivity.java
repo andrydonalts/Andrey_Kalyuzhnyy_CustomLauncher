@@ -9,14 +9,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 
 public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragmentDialog.DeleteAppInterface {
 
@@ -24,8 +21,6 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
     private Adapter adapter;
     private GridView gridView;
     private EditText searchEditText;
-    private AppsManager appsManager;
-    private ArrayList<AppsDetail> apps;
     boolean inGridMode = true;
     private Menu menu;
 
@@ -114,10 +109,9 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
             gridView.setNumColumns(resources.getInteger(R.integer.landscape_column_number));
     }
 
+    // when deleting app and using notifyDataSetChanged() I have to reload activity to see that app was deleted
     @Override
     public void deleteApp(String packageName) {
-        Log.d("AllAppsActivity", packageName + " app will be deleted");
-
         Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
         intent.setData(Uri.parse("package:" + packageName));
 
@@ -129,6 +123,7 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
         if (requestCode == REQUEST_UNINSTALL) {
             if (resultCode == Activity.RESULT_OK) {
                 Toast.makeText(this, "Uninstall succeeded!", Toast.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Toast.makeText(this, "Uninstall canceled!", Toast.LENGTH_SHORT).show();
                 adapter.notifyDataSetChanged();

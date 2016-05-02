@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +26,7 @@ public class AppsManager {
         mainScreenApps = new ArrayList<>();
     }
 
+
     public void loadApps(){
         AppsDetail appsDetail;
 
@@ -43,21 +43,6 @@ public class AppsManager {
                 appsDetail.setOnMainScreen(true);
             }
 
-            String label = resolveInfo.loadLabel(manager).toString();
-            Drawable icon = resolveInfo.loadIcon(manager);
-            String name = resolveInfo.activityInfo.packageName;
-
-            appsDetail.setLabel(label);
-            appsDetail.setName(name);
-            appsDetail.setIcon(icon);
-            apps.add(appsDetail);
-        }
-
-
-        /*
-        for (ResolveInfo resolveInfo : availableActives){
-            appsDetail = new AppsDetail();
-
 
             String label = resolveInfo.loadLabel(manager).toString();
             Drawable icon = resolveInfo.loadIcon(manager);
@@ -68,49 +53,20 @@ public class AppsManager {
             appsDetail.setIcon(icon);
             apps.add(appsDetail);
         }
-        */
     }
 
 
 
+    // I can load mainScreenApps independently, that's more efficient, but I don't know what's the better way to do
+    // communication between arrays.
     public void loadMainScreenApps(){
-        //AppsDetail appsDetail;
+
         loadApps();
-
-        Log.d("AppsManager", Integer.toString(apps.size()));
-
         for (AppsDetail appsDetail1 : apps){
             if (appsDetail1.isOnMainScreen() == true) {
                 mainScreenApps.add(appsDetail1);
             }
         }
-
-        Log.d("AppsManager", "onMainScreen: " + Integer.toString(mainScreenApps.size()));
-        /*
-        Intent intent = new Intent(Intent.ACTION_MAIN, null);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-
-        List<ResolveInfo> availableActives = manager.queryIntentActivities(intent, 0);
-        int counter = 0;
-            for (ResolveInfo resolveInfo : availableActives){
-                if (counter == 15) {
-                    return;
-                }
-                appsDetail = new AppsDetail();
-
-                String label = resolveInfo.loadLabel(manager).toString();
-                Drawable icon = resolveInfo.loadIcon(manager);
-                String name = resolveInfo.activityInfo.packageName;
-
-                Log.d("AppsManager", label);
-
-                appsDetail.setLabel(label);
-                appsDetail.setName(name);
-                appsDetail.setIcon(icon);
-                mainScreenApps.add(appsDetail);
-                counter++;
-            }
-            */
     }
 
 
