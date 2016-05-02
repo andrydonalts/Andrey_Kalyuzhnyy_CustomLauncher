@@ -7,15 +7,18 @@
     android:background="@android:color/darker_gray"
     tools:context=".MainActivity">
 
-        <GridView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/activity_main_linear_layout"
-            android:id="@+id/gridview"
-            android:numColumns="@integer/portrait_column_number"
-            android:background="@android:color/darker_gray"
-            android:verticalSpacing="@dimen/grid_item_spacing"
-            android:horizontalSpacing="@dimen/grid_item_spacing"/>
+
+    <android.support.v7.widget.GridLayout
+        xmlns:grid="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        grid:columnCount="3"
+        grid:rowCount="5"
+        grid:alignmentMode="alignBounds"
+
+        android:layout_above="@+id/activity_main_linear_layout"
+        android:id="@+id/activity_main_gridLayout"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,6 +26,7 @@
         android:layout_alignParentBottom="true"
         android:background="@android:color/darker_gray"
         android:id="@id/activity_main_linear_layout">
+
         <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"

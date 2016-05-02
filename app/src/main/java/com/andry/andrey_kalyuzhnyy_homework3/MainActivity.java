@@ -1,23 +1,30 @@
 package com.andry.andrey_kalyuzhnyy_homework3;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayout;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Adapter adapter;
-    private GridView gridView;
     private View dialerButton;
     private Button appsButton;
     private View messageButton;
+    private AppsManager appsManager;
+    private ArrayList<AppsDetail> mainScreenApps;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +39,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         appsButton.setOnClickListener(this);
         messageButton.setOnClickListener(this);
 
-        gridView = (GridView) findViewById(R.id.gridview);
-        adapter = new Adapter(this);
-        adapter.loadApps();
-        gridView.setAdapter(adapter);
+        appsManager = new AppsManager(this);
+        //mainScreenApps = appsManager.fillMainScreenApps();
+        appsManager.loadMainScreenApps();
+        mainScreenApps = new ArrayList<>(15);
+        mainScreenApps.addAll(appsManager.getMainScreenApps());
+        Log.d("MainActivity", Integer.toString(mainScreenApps.size()));
 
-        setScreenOrientation();
+        setGridLayout();
+
     }
 
     @Override
@@ -52,14 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    private void setScreenOrientation(){
-        Resources resources = getResources();
-        if(resources.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-            gridView.setNumColumns(resources.getInteger(R.integer.portrait_column_number));
-        else if (resources.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-            gridView.setNumColumns(resources.getInteger(R.integer.landscape_column_number));
 
-    }
 
     @Override
     public void onClick(View view) {
@@ -79,4 +82,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         }
     }
+
+    public void setGridLayout() {
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.activity_main_gridLayout);
+        LayoutInflater layoutInflater = (LayoutInflater)
+                this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        if (isPortraitOrientation() == false) {
+            gridLayout.setColumnCount(5);
+            gridLayout.setRowCount(3);
+        }
+
+        int row = -1;
+        for (int i = 0; i < 15; i++) {
+
+            final AppsDetail appsDetail = mainScreenApps.get(i);
+            View appItemView = layoutInflater.inflate(R.layout.app_item, null, false);
+
+            int col = 0;
+            if (isPortraitOrientation() == false) {
+                col = i % 5;
+            } else {
+                col = i % 3;
+            }
+
+            if (col == 0){
+                row++;
+            }
+
+            ImageView icon = (ImageView) appItemView.findViewById(R.id.app_item_icon);
+            TextView label = (TextView) appItemView.findViewById(R.id.app_item_label);
+            icon.setImageDrawable(appsDetail.getIcon());
+            label.setText(appsDetail.getLabel());
+
+            appItemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    appsManager.startApp(appsDetail);
+                }
+            });
+
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = 0;
+            params.height = 0;
+            params.columnSpec = GridLayout.spec(col, 1f);
+            params.rowSpec = GridLayout.spec(row, 1f);
+            params.setMargins(3, 3, 3, 3);
+            appItemView.setLayoutParams(params);
+            gridLayout.addView(appItemView, 0);
+
+        }
+    }
+
+    private boolean isPortraitOrientation(){
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+    }
+
 }
