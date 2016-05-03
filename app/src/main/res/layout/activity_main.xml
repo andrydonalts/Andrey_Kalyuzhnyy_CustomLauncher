@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/darker_gray"
     tools:context=".MainActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:id="@+id/activity_main_toolbar"
+        android:layout_alignParentTop="true"
+        app:contentInsetStart="0dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="21sp"
+            android:textColor="@android:color/white"
+            android:text="remove"
+            android:visibility="invisible"
+            android:id="@+id/activity_main_removeText"/>
+
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v7.widget.GridLayout
         xmlns:grid="http://schemas.android.com/apk/res-auto"
@@ -14,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         grid:columnCount="3"
+        android:layout_below="@id/activity_main_toolbar"
         android:layout_above="@+id/activity_main_linear_layout"
         android:id="@+id/activity_main_gridLayout"/>
 

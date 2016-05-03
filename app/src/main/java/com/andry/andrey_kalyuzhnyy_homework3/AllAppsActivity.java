@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -23,6 +24,7 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
     private EditText searchEditText;
     boolean inGridMode = true;
     private Menu menu;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,9 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
 
         searchEditText.addTextChangedListener(textWatcher);
         setScreenOrientation();
+
+        toolbar = (Toolbar) findViewById(R.id.activity_all_apps_toolbar);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -50,9 +55,8 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.menu_all_apps_layout_icon) {
+
+        if (id == R.id.menu_all_apps_layout_icon) {
            changeMode();
         }
 

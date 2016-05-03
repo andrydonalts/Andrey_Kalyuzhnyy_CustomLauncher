@@ -1,11 +1,20 @@
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/darker_gray"
     android:focusableInTouchMode="true">
 
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:id="@+id/activity_all_apps_toolbar">
+
+    </android.support.v7.widget.Toolbar>
 
 
     <EditText
@@ -18,11 +27,10 @@
     <GridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/activity_all_apps_edit"
         android:id="@+id/activity_all_apps_gridview"
         android:numColumns="@integer/portrait_column_number"
         android:background="@android:color/darker_gray"
         android:verticalSpacing="@dimen/grid_item_spacing"
         android:horizontalSpacing="@dimen/grid_item_spacing"/>
 
-</RelativeLayout>
+</LinearLayout>

@@ -4,9 +4,11 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayout;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private GridLayout gridLayout;
     private AppsManager appsManager;
     private ArrayList<AppsDetail> mainScreenApps;
+    private Toolbar toolbar;
+    private TextView toolbarRemoveText;
 
 
     @Override
@@ -46,6 +50,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         appsManager.loadMainScreenApps();
         mainScreenApps = new ArrayList<>(15);
         mainScreenApps.addAll(appsManager.getMainScreenApps());
+
+        toolbar = (Toolbar) findViewById(R.id.activity_main_toolbar);
+        setSupportActionBar(toolbar);
+        //getSupportActionBar().setDisplayShowTitleEnabled(true);
+        toolbarRemoveText = (TextView) findViewById(R.id.activity_main_removeText);
+        //toolbarRemoveText.setOnDragListener(new DragListener());
+        toolbar.setOnDragListener(new DragListener());
 
         setGridLayout();
 
@@ -96,6 +107,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+    class DragListener implements View.OnDragListener{
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            toolbarRemoveText.setVisibility(View.VISIBLE);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            View view = (View) event.getLocalState();
+            switch (event.getAction()){
+                case DragEvent.ACTION_DRAG_LOCATION :
+                    if (view == v) {
+                        return true;
+                    }
+
+                    if (v == toolbar){
+                        toolbarRemoveText.setTextColor(Color.RED);
+                        return true;
+                    }
+
+                    int index = calculateNewIndex(event.getX(), event.getY());
+
+                    gridLayout.removeView(view);
+                    gridLayout.addView(view, index);
+                    break;
+                case DragEvent.ACTION_DROP :
+                    if (v == toolbar){
+                        Log.d("OnDrag", "view dropped on remove text");
+                        //gridLayout.removeView(view);
+                        view.setVisibility(View.GONE);
+                    } else {
+                        view.setVisibility(View.VISIBLE);
+                    }
+
+                    break;
+                case DragEvent.ACTION_DRAG_ENDED :
+                    toolbarRemoveText.setTextColor(Color.WHITE);
+                    toolbarRemoveText.setVisibility(View.INVISIBLE);
+                    getSupportActionBar().setDisplayShowTitleEnabled(true);
+                    if (!event.getResult())
+                        view.setVisibility(View.VISIBLE);
+            }
+            return true;
+        }
+    }
+
+
+    private int calculateNewIndex(float x, float y) {
+
+        float cellWidth = gridLayout.getWidth() / gridLayout.getColumnCount();
+        int column = (int) (x /cellWidth);
+
+        float cellHeight = gridLayout.getHeight() / gridLayout.getRowCount();
+        int row = (int) Math.floor(y / cellHeight);
+
+        int index = row * gridLayout.getColumnCount() + column;
+        if (index >= gridLayout.getChildCount())
+            index = gridLayout.getChildCount() - 1;
+
+        Log.d("calcNewInd", "row = " + Integer.toString(row) + " col = " + Integer.toString(column) + " index = " + Integer.toString(index));
+        return index;
+    }
+
     // putting views in gridlayout dynamically
     public void setGridLayout() {
         gridLayout = (GridLayout) findViewById(R.id.activity_main_gridLayout);
@@ -138,50 +211,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             gridLayout.addView(appItemView);
 
         }
-    }
-
-    class DragListener implements View.OnDragListener{
-
-        @Override
-        public boolean onDrag(View v, DragEvent event) {
-            View view = (View) event.getLocalState();
-            switch (event.getAction()){
-                case DragEvent.ACTION_DRAG_LOCATION :
-                    if (view == v) {
-                        return true;
-                    }
-
-                    int index = calculateNewIndex(event.getX(), event.getY());
-
-                    gridLayout.removeView(view);
-                    gridLayout.addView(view, index);
-                    break;
-                case DragEvent.ACTION_DROP :
-                    view.setVisibility(View.VISIBLE);
-                    break;
-                case DragEvent.ACTION_DRAG_ENDED :
-                    if (!event.getResult())
-                        view.setVisibility(View.VISIBLE);
-            }
-            return true;
-        }
-    }
-
-
-    private int calculateNewIndex(float x, float y) {
-
-        float cellWidth = gridLayout.getWidth() / gridLayout.getColumnCount();
-        int column = (int) (x /cellWidth);
-
-        float cellHeight = gridLayout.getHeight() / gridLayout.getRowCount();
-        int row = (int) Math.floor(y / cellHeight);
-
-        int index = row * gridLayout.getColumnCount() + column;
-        if (index >= gridLayout.getChildCount())
-            index = gridLayout.getChildCount() - 1;
-
-        Log.d("calcNewInd", "row = " + Integer.toString(row) + " col = " + Integer.toString(column) + " index = " + Integer.toString(index));
-        return index;
     }
 
     private boolean isPortraitOrientation(){
