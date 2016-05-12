@@ -56,7 +56,7 @@ public class AppDeleteFragmentDialog extends DialogFragment implements View.OnCl
         int id = view.getId();
         if (id == R.id.dialog_delete_app_deleteButton) {
 
-            ((DeleteAppInterface) getActivity()).deleteApp(appsDetail.getName());
+            ((DeleteAppInterface) getActivity()).deleteApp(appsDetail);
             dismiss();
         } else if (id == R.id.dialog_delete_app_cancelButton) {
             dismiss();
@@ -64,6 +64,6 @@ public class AppDeleteFragmentDialog extends DialogFragment implements View.OnCl
     }
 
     public interface DeleteAppInterface{
-        void deleteApp(String packageName);
+        void deleteApp(AppsDetail deleteApp);
     }
 }

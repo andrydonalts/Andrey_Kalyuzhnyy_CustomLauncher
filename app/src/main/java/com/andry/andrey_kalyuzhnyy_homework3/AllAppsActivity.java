@@ -1,6 +1,5 @@
 package com.andry.andrey_kalyuzhnyy_homework3;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -16,25 +15,31 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragmentDialog.DeleteAppInterface {
 
-    private static final int REQUEST_UNINSTALL = 1;
     private Adapter adapter;
     private GridView gridView;
-    private EditText searchEditText;
-    boolean inGridMode = true;
+    boolean inGridMode;
     private Menu menu;
-    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_apps);
 
+        EditText searchEditText;
+        Toolbar toolbar;
+
+        inGridMode = true;
         searchEditText = (EditText) findViewById(R.id.activity_all_apps_edit);
 
+        Bundle bundle = getIntent().getExtras();
+        ArrayList<AppsDetail> mainScreenApps = bundle.getParcelableArrayList(MainActivity.mainScreenApps_Extra);
+
         gridView = (GridView) findViewById(R.id.activity_all_apps_gridview);
-        adapter = new Adapter(this);
+        adapter = new Adapter(this, mainScreenApps);
         gridView.setAdapter(adapter);
 
         searchEditText.addTextChangedListener(textWatcher);
@@ -55,7 +60,6 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-
         if (id == R.id.menu_all_apps_layout_icon) {
            changeMode();
         }
@@ -66,12 +70,10 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
         }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-
         }
 
         @Override
@@ -80,6 +82,9 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
         }
     };
 
+    /*
+    Changing toolbar icon when changing between grid and linear modes
+     */
     private void changeMode() {
         if (menu != null) {
             MenuItem item = menu.findItem(R.id.menu_all_apps_layout_icon);
@@ -107,33 +112,17 @@ public class AllAppsActivity extends AppCompatActivity implements AppDeleteFragm
 
     private void setScreenOrientation() {
         Resources resources = getResources();
-        if (resources.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        if (Util.isPortraitOrientation(this))
             gridView.setNumColumns(resources.getInteger(R.integer.portrait_column_number));
-        else if (resources.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+        else
             gridView.setNumColumns(resources.getInteger(R.integer.landscape_column_number));
     }
 
-    // when deleting app and using notifyDataSetChanged() I have to reload activity to see that app was deleted
     @Override
-    public void deleteApp(String packageName) {
+    public void deleteApp(AppsDetail deleteApp) {
         Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
-        intent.setData(Uri.parse("package:" + packageName));
-
-        startActivityForResult(intent, REQUEST_UNINSTALL);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_UNINSTALL) {
-            if (resultCode == Activity.RESULT_OK) {
-                Toast.makeText(this, "Uninstall succeeded!", Toast.LENGTH_SHORT).show();
-                adapter.notifyDataSetChanged();
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(this, "Uninstall canceled!", Toast.LENGTH_SHORT).show();
-                adapter.notifyDataSetChanged();
-            } else {
-                Toast.makeText(this, "Uninstall Failed!", Toast.LENGTH_SHORT).show();
-            }
-        }
+        intent.setData(Uri.parse("package:" + deleteApp.getName()));
+        adapter.deleteApp(deleteApp);
+        startActivity(intent);
     }
 }

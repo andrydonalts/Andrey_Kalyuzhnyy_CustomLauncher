@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -24,16 +26,22 @@ public class Adapter extends BaseAdapter implements Filterable {
     private Context context;
     private ArrayList<AppsDetail> apps;
     private ArrayList<AppsDetail> filteredApps;
+    private ArrayList<AppsDetail> mainScreenApps;
     private CustomFilter filter;
     private AppsManager appsManager;
 
-    public Adapter(Context context) {
+    public Adapter(Context context, ArrayList<AppsDetail> mainScreenApps) {
         this.context = context;
 
         appsManager = new AppsManager(context);
         appsManager.loadApps();
+
+        this.mainScreenApps = mainScreenApps;
+
         apps = appsManager.getAppsList();
         this.filteredApps = apps;
+
+
     }
 
     @Override
@@ -52,17 +60,18 @@ public class Adapter extends BaseAdapter implements Filterable {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
-        Holder holder;
+        final Holder holder;
 
         if (convertView == null){
             holder = new Holder();
-            convertView = View.inflate(context, R.layout.app_item, null);
+            convertView = View.inflate(context, R.layout.app_item_checkbox, null);
 
-            holder.icon = (ImageView) convertView.findViewById(R.id.app_item_icon);
-            holder.label = (TextView) convertView.findViewById(R.id.app_item_label);
-            holder.item = convertView.findViewById(R.id.app_item_item);
+            holder.icon = (ImageView) convertView.findViewById(R.id.app_item_checkbox_icon);
+            holder.label = (TextView) convertView.findViewById(R.id.app_item_checkbox_label);
+            holder.item = convertView.findViewById(R.id.app_item_checkbox_item);
+            holder.checkBox = (CheckBox) convertView.findViewById(R.id.app_item_checkbox);
 
             convertView.setTag(holder);
         } else {
@@ -74,6 +83,25 @@ public class Adapter extends BaseAdapter implements Filterable {
         holder.icon.setImageDrawable(appsDetail.getIcon());
         holder.label.setText(appsDetail.getLabel());
 
+        for(int i = 0; i < mainScreenApps.size(); i++) {
+            if (mainScreenApps.get(i).getLabel().equals(appsDetail.getLabel())) {
+                holder.checkBox.setChecked(true);
+                break;
+            } else {
+                holder.checkBox.setChecked(false);
+            }
+        }
+
+
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d("Adapter", "onCheckedChange");
+                if (appsDetail.isOnMainScreen()) {
+
+                }
+            }
+        });
         // opening app
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,13 +177,15 @@ public class Adapter extends BaseAdapter implements Filterable {
         }
     }
 
-
     private class Holder{
         ImageView icon;
         TextView label;
         View item;
+        CheckBox checkBox;
     }
 
-
-
+    public void deleteApp(AppsDetail deleteApp){
+        apps.remove(deleteApp);
+        notifyDataSetChanged();
+    }
 }

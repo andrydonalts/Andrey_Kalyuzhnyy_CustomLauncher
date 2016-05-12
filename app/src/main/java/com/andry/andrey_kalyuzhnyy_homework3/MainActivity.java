@@ -3,7 +3,6 @@ package com.andry.andrey_kalyuzhnyy_homework3;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,8 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,30 +18,35 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
-    private View dialerButton;
-    private Button appsButton;
-    private View messageButton;
+    public static String mainScreenApps_Extra = "mainScreenApps_Extra";
+
     private GridLayout gridLayout;
     private AppsManager appsManager;
     private ArrayList<AppsDetail> mainScreenApps;
     private Toolbar toolbar;
     private TextView toolbarRemoveText;
-
+    private int index;
+    private AppsDetail draggedApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        View dialerButton;
+        Button appsButton;
+        View messageButton;
+
         dialerButton = findViewById(R.id.activity_main_dialerButton);
         appsButton = (Button) findViewById(R.id.activity_main_appsButton);
         messageButton = findViewById(R.id.activity_main_messageButton);
+        gridLayout = (GridLayout) findViewById(R.id.activity_main_gridLayout);
 
-        dialerButton.setOnClickListener(this);
-        appsButton.setOnClickListener(this);
-        messageButton.setOnClickListener(this);
+        dialerButton.setOnClickListener(new OnClickListener());
+        appsButton.setOnClickListener(new OnClickListener());
+        messageButton.setOnClickListener(new OnClickListener());
 
         appsManager = new AppsManager(this);
         appsManager.loadMainScreenApps();
@@ -53,56 +55,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         toolbar = (Toolbar) findViewById(R.id.activity_main_toolbar);
         setSupportActionBar(toolbar);
-        //getSupportActionBar().setDisplayShowTitleEnabled(true);
         toolbarRemoveText = (TextView) findViewById(R.id.activity_main_removeText);
-        //toolbarRemoveText.setOnDragListener(new DragListener());
         toolbar.setOnDragListener(new DragListener());
 
-        setGridLayout();
-
+        gridLayout.setOnDragListener(new DragListener());
+        setGridLayout(gridLayout);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    private class OnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View view) {
+            int id = view.getId();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        return super.onOptionsItemSelected(item);
-    }
-
-
-
-    @Override
-    public void onClick(View view) {
-        int id = view.getId();
-
-        if (id == R.id.activity_main_appsButton) {
-            Intent intent = new Intent(this, AllAppsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.activity_main_dialerButton) {
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_DIAL);
-            startActivity(intent);
-        } else if (id == R.id.activity_main_messageButton) {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.setType("vnd.android-dir/mms-sms");
-            startActivity(intent);
+            if (id == R.id.activity_main_appsButton) {
+                Intent intent = new Intent(MainActivity.this, AllAppsActivity.class);
+                intent.putParcelableArrayListExtra(mainScreenApps_Extra , mainScreenApps);
+                startActivity(intent);
+            } else if (id == R.id.activity_main_dialerButton) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_DIAL);
+                startActivity(intent);
+            } else if (id == R.id.activity_main_messageButton) {
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+                intent.setType("vnd.android-dir/mms-sms");
+                startActivity(intent);
+            }
         }
     }
 
     class LongPressListener implements View.OnLongClickListener{
-
         @Override
         public boolean onLongClick(View view) {
             final ClipData data = ClipData.newPlainText("", "");
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
             view.startDrag(data, shadowBuilder, view, 0);
             view.setVisibility(View.INVISIBLE);
+            index = calculateNewIndex(view.getX(), view.getY());
+            draggedApp = mainScreenApps.get(index);
+            Log.d("OnDragStart", mainScreenApps.get(index).getLabel());
             return true;
         }
     }
@@ -110,49 +101,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     class DragListener implements View.OnDragListener{
 
+        boolean deleteAppFromList = false;
+
         @Override
         public boolean onDrag(View v, DragEvent event) {
             toolbarRemoveText.setVisibility(View.VISIBLE);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
             View view = (View) event.getLocalState();
             switch (event.getAction()){
+
                 case DragEvent.ACTION_DRAG_LOCATION :
                     if (view == v) {
                         return true;
                     }
-
                     if (v == toolbar){
                         toolbarRemoveText.setTextColor(Color.RED);
                         return true;
                     }
-
-                    int index = calculateNewIndex(event.getX(), event.getY());
-
+                    index = calculateNewIndex(event.getX(), event.getY());
                     gridLayout.removeView(view);
+                    Log.d("Action_Drag_Location", "index " + Integer.toString(index));
                     gridLayout.addView(view, index);
                     break;
-                case DragEvent.ACTION_DROP :
-                    if (v == toolbar){
-                        Log.d("OnDrag", "view dropped on remove text");
-                        //gridLayout.removeView(view);
-                        view.setVisibility(View.GONE);
-                    } else {
-                        view.setVisibility(View.VISIBLE);
-                    }
 
+                case DragEvent.ACTION_DROP :
+                    actionDrop(v, view);
                     break;
+
                 case DragEvent.ACTION_DRAG_ENDED :
-                    toolbarRemoveText.setTextColor(Color.WHITE);
-                    toolbarRemoveText.setVisibility(View.INVISIBLE);
-                    getSupportActionBar().setDisplayShowTitleEnabled(true);
-                    if (!event.getResult())
-                        view.setVisibility(View.VISIBLE);
+                    actionDragEnded(event, view);
             }
             return true;
+        }
+
+        private void actionDrop(View dropView, View view){
+            if (dropView == toolbar){
+                Log.d("actionDrop", "toolbar drop");
+                deleteAppFromList = true;
+                view.setVisibility(View.GONE);
+            } else {
+                view.setVisibility(View.VISIBLE);
+                Log.d("actionDrop", "have to stay visible");
+            }
+        }
+
+        private void actionDragEnded(DragEvent event, View view){
+            toolbarRemoveText.setTextColor(Color.WHITE);
+            toolbarRemoveText.setVisibility(View.INVISIBLE);
+            if (!event.getResult()) {
+                Log.d("actionDragEnded", "have to stay visible");
+                view.setVisibility(View.VISIBLE);
+            } else {
+                Log.d("actionDragEnded", "not visible");
+
+                if (deleteAppFromList == true) {
+                    Log.d("actionDragEnded", "deleteAppFromList == true");
+
+                    draggedApp.setOnMainScreen(false);
+                    deleteAppFromList = false;
+                }
+                mainScreenApps.add(index, draggedApp);
+            }
         }
     }
 
 
+
+    /*
+    calculates new index of view in gridlayout when it's dragged
+     */
     private int calculateNewIndex(float x, float y) {
 
         float cellWidth = gridLayout.getWidth() / gridLayout.getColumnCount();
@@ -165,28 +181,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (index >= gridLayout.getChildCount())
             index = gridLayout.getChildCount() - 1;
 
-        Log.d("calcNewInd", "row = " + Integer.toString(row) + " col = " + Integer.toString(column) + " index = " + Integer.toString(index));
+        //Log.d("calcNewInd", "row = " + Integer.toString(row) + " col = " + Integer.toString(column) + " index = " + Integer.toString(index));
         return index;
     }
 
     // putting views in gridlayout dynamically
-    public void setGridLayout() {
-        gridLayout = (GridLayout) findViewById(R.id.activity_main_gridLayout);
-        gridLayout.setOnDragListener(new DragListener());
+    public void setGridLayout(GridLayout gridLayout) {
 
         LayoutInflater layoutInflater = (LayoutInflater)
                 this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if (isPortraitOrientation() == false) {
+        if (!Util.isPortraitOrientation(this)) {
             gridLayout.setColumnCount(5);
             gridLayout.setRowCount(3);
         }
 
-        for (int i = 0; i < 15; i++) {
+        inflatingGridLayout(layoutInflater);
+    }
 
+    private void inflatingGridLayout(LayoutInflater layoutInflater){
+        for (int i = 0; i < 15; i++) {
             final AppsDetail appsDetail = mainScreenApps.get(i);
             View appItemView = layoutInflater.inflate(R.layout.app_item, null, false);
-
 
             ImageView icon = (ImageView) appItemView.findViewById(R.id.app_item_icon);
             TextView label = (TextView) appItemView.findViewById(R.id.app_item_label);
@@ -208,13 +224,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
             params.setMargins(3, 3, 3, 3);
             appItemView.setLayoutParams(params);
-            gridLayout.addView(appItemView);
 
+            gridLayout.addView(appItemView);
         }
     }
-
-    private boolean isPortraitOrientation(){
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-    }
-
 }
