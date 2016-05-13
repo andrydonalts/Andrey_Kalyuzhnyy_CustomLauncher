@@ -128,39 +128,31 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case DragEvent.ACTION_DRAG_ENDED :
-                    actionDragEnded(event, view);
+                    actionDragEnded();
             }
             return true;
         }
 
         private void actionDrop(View dropView, View view){
             if (dropView == toolbar){
-                Log.d("actionDrop", "toolbar drop");
                 deleteAppFromList = true;
+                draggedApp.setIsVisibleOnMainScreen(false);
+                deleteAppFromList = false;
                 view.setVisibility(View.GONE);
             } else {
                 view.setVisibility(View.VISIBLE);
-                Log.d("actionDrop", "have to stay visible");
+            }
+
+            mainScreenApps.remove(draggedApp);
+            mainScreenApps.add(index, draggedApp);
+            for (int i = 0; i < 15; i++){
+                Log.d("actionDragEnded", Integer.toString(i) + " " +  mainScreenApps.get(i).getLabel() + " " + mainScreenApps.get(i).isVisibleOnMainScreen());
             }
         }
 
-        private void actionDragEnded(DragEvent event, View view){
+        private void actionDragEnded(){
             toolbarRemoveText.setTextColor(Color.WHITE);
             toolbarRemoveText.setVisibility(View.INVISIBLE);
-            if (!event.getResult()) {
-                Log.d("actionDragEnded", "have to stay visible");
-                view.setVisibility(View.VISIBLE);
-            } else {
-                Log.d("actionDragEnded", "not visible");
-
-                if (deleteAppFromList == true) {
-                    Log.d("actionDragEnded", "deleteAppFromList == true");
-
-                    draggedApp.setOnMainScreen(false);
-                    deleteAppFromList = false;
-                }
-                mainScreenApps.add(index, draggedApp);
-            }
         }
     }
 

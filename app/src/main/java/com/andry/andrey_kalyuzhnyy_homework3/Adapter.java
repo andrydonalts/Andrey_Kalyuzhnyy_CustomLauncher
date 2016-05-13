@@ -84,7 +84,9 @@ public class Adapter extends BaseAdapter implements Filterable {
         holder.label.setText(appsDetail.getLabel());
 
         for(int i = 0; i < mainScreenApps.size(); i++) {
-            if (mainScreenApps.get(i).getLabel().equals(appsDetail.getLabel())) {
+            AppsDetail mainScreenApp = mainScreenApps.get(i);
+            //Log.d("Adapter", mainScreenApp.getLabel() + " " + mainScreenApp.isVisibleOnMainScreen());
+            if (mainScreenApp.getLabel().equals(appsDetail.getLabel()) && mainScreenApp.isVisibleOnMainScreen()) {
                 holder.checkBox.setChecked(true);
                 break;
             } else {
@@ -97,7 +99,7 @@ public class Adapter extends BaseAdapter implements Filterable {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Log.d("Adapter", "onCheckedChange");
-                if (appsDetail.isOnMainScreen()) {
+                if (appsDetail.isVisibleOnMainScreen()) {
 
                 }
             }
@@ -156,7 +158,7 @@ public class Adapter extends BaseAdapter implements Filterable {
                 for(int i = 0; i < filteredApps.size(); i++) {
                     if (filteredApps.get(i).getLabel().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         AppsDetail filteredApp = filteredApps.get(i);
-                        AppsDetail appDetail = new AppsDetail(filteredApp.getLabel(), filteredApp.getName(), filteredApp.getIcon(), filteredApp.isOnMainScreen());
+                        AppsDetail appDetail = new AppsDetail(filteredApp.getLabel(), filteredApp.getName(), filteredApp.getIcon(), filteredApp.isVisibleOnMainScreen());
                         filters.add(appDetail);
                     }
                 }

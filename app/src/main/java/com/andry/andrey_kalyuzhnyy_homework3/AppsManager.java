@@ -74,7 +74,7 @@ public class AppsManager{
 
         for (int i = 0; i < 15; i++){
             AppsDetail mainScreenApp = apps.get(i);
-            mainScreenApp.setOnMainScreen(true);
+            mainScreenApp.setIsVisibleOnMainScreen(true);
             mainScreenApps.add(mainScreenApp);
         }
     }
@@ -98,17 +98,6 @@ public class AppsManager{
     public void startApp(AppsDetail appsDetail) {
         Intent intent = manager.getLaunchIntentForPackage(appsDetail.getName());
         context.startActivity(intent);
-    }
-
-    public void onInvisibleOnMainScreen(AppsDetail appsDetail){
-        for (int i = 0; i < apps.size(); i++){
-            if (appsDetail.getName() == apps.get(i).getName()){
-                Log.d("AppsManager", appsDetail.getLabel());
-                appsDetail.setOnMainScreen(false);
-                apps.remove(i);
-                apps.add(i, appsDetail);
-            }
-        }
     }
 
 }

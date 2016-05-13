@@ -13,7 +13,7 @@ public class AppsDetail implements Parcelable{
     private String label;
     private String name;
     private Drawable icon;
-    private boolean isOnMainScreen;
+    private boolean isVisibleOnMainScreen;
 
     public AppsDetail() {
 
@@ -23,7 +23,7 @@ public class AppsDetail implements Parcelable{
         this.label = label;
         this.name = name;
         this.icon = icon;
-        this.isOnMainScreen = isOnMainScreen;
+        this.isVisibleOnMainScreen = isOnMainScreen;
     }
 
     public AppsDetail(Parcel in) {
@@ -31,7 +31,7 @@ public class AppsDetail implements Parcelable{
         this.name = in.readString();
         Bitmap bitmap = in.readParcelable(getClass().getClassLoader());
         this.icon = new BitmapDrawable(bitmap);
-        this.isOnMainScreen = in.readByte() == 1;
+        this.isVisibleOnMainScreen = in.readByte() == 1;
     }
 
     public String getLabel() {
@@ -58,12 +58,12 @@ public class AppsDetail implements Parcelable{
         this.icon = icon;
     }
 
-    public boolean isOnMainScreen() {
-        return isOnMainScreen;
+    public boolean isVisibleOnMainScreen() {
+        return isVisibleOnMainScreen;
     }
 
-    public void setOnMainScreen(boolean onMainScreen) {
-        isOnMainScreen = onMainScreen;
+    public void setIsVisibleOnMainScreen(boolean onMainScreen) {
+        isVisibleOnMainScreen = onMainScreen;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class AppsDetail implements Parcelable{
         out.writeString(name);
         Bitmap bitmap = ((BitmapDrawable) icon).getBitmap();
         out.writeParcelable(bitmap, flags);
-        out.writeByte((byte) (isOnMainScreen() ? 1 : 0));
+        out.writeByte((byte) (isVisibleOnMainScreen() ? 1 : 0));
     }
 
     public static Creator<AppsDetail> CREATOR = new Creator<AppsDetail>() {
