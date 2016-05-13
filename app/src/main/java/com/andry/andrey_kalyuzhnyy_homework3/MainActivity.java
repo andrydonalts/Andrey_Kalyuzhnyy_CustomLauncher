@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView toolbarRemoveText;
     private int index;
     private AppsDetail draggedApp;
+    private SharedPreference sharedPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         appsButton = (Button) findViewById(R.id.activity_main_appsButton);
         messageButton = findViewById(R.id.activity_main_messageButton);
         gridLayout = (GridLayout) findViewById(R.id.activity_main_gridLayout);
+        sharedPreference = new SharedPreference();
 
         dialerButton.setOnClickListener(new OnClickListener());
         appsButton.setOnClickListener(new OnClickListener());
@@ -57,6 +59,19 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbarRemoveText = (TextView) findViewById(R.id.activity_main_removeText);
         toolbar.setOnDragListener(new DragListener());
+
+        // Try to store data in sharedPreference, but get mistake
+        if (sharedPreference.getMainScreenApps(this) == null){
+            Log.d("MainActivity", "sharedPreference.getMainScreenApps(this) == null " + mainScreenApps.get(0).getLabel());
+            sharedPreference.addMainScreenApp(this, mainScreenApps.get(0));
+        }
+
+        ArrayList<AppsDetail> checkList = sharedPreference.getMainScreenApps(this);
+        if (checkList != null) {
+            for (int i = 0; i < checkList.size(); i++) {
+                Log.d("MainActivity", checkList.get(i).getLabel());
+            }
+        }
 
         gridLayout.setOnDragListener(new DragListener());
         setGridLayout(gridLayout);

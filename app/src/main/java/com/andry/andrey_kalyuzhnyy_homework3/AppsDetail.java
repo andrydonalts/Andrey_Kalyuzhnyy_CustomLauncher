@@ -16,7 +16,7 @@ public class AppsDetail implements Parcelable{
     private boolean isVisibleOnMainScreen;
 
     public AppsDetail() {
-
+        super();
     }
 
     public AppsDetail(String label, String name, Drawable icon, boolean isOnMainScreen) {
@@ -91,4 +91,10 @@ public class AppsDetail implements Parcelable{
             return new AppsDetail[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "AppsDetail [label=" + label + ", name=" + name + ", icon="
+                + icon + ", isVisibleOnMainScreen=" + isVisibleOnMainScreen + "]";
+    }
 }
